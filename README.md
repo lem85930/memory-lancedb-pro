@@ -409,10 +409,12 @@ Cross-encoder reranking supports multiple providers via `rerankProvider`:
 | **SiliconFlow** (free tier available) | `siliconflow` | `https://api.siliconflow.com/v1/rerank` | `BAAI/bge-reranker-v2-m3`, `Qwen/Qwen3-Reranker-8B` |
 | **Voyage AI** | `voyage` | `https://api.voyageai.com/v1/rerank` | `rerank-2.5` |
 | **Pinecone** | `pinecone` | `https://api.pinecone.io/rerank` | `bge-reranker-v2-m3` |
+| **vLLM / Docker Model Runner** | `vllm` | _requires custom endpoint_ | `Qwen3-Reranker` |
 
 Notes:
 - `voyage` sends `{ model, query, documents }` without `top_n`.
 - Voyage responses are parsed from `data[].relevance_score`.
+- `vllm` requires a custom `rerankEndpoint` (no API key needed). Only works on x86_64 NVIDIA platforms.
 
 <details>
 <summary><strong>SiliconFlow Example</strong></summary>
@@ -461,6 +463,25 @@ Notes:
     "rerankModel": "bge-reranker-v2-m3"
   }
 }
+```
+
+</details>
+
+<details>
+<summary><strong>vLLM / Docker Model Runner Example</strong></summary>
+
+```json
+{
+  "retrieval": {
+    "rerank": "cross-encoder",
+    "rerankProvider": "vllm",
+    "rerankEndpoint": "http://host.docker.internal:12434/engines/vllm/rerank",
+    "rerankModel": "ai/qwen3-reranker:0.6B"
+  }
+}
+```
+
+**Note:** vLLM reranking only works on x86_64 NVIDIA platforms. For macOS Apple Silicon, use `llama.cpp` for embeddings but not vLLM for reranking.
 ```
 
 </details>

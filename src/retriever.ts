@@ -595,6 +595,14 @@ export class MemoryRetriever {
           this.config.rerankEndpoint || "https://api.jina.ai/v1/rerank";
         const documents = results.map((r) => r.entry.text);
 
+        // vLLM requires a custom endpoint - fail fast if using default Jina endpoint
+        if (provider === "vllm" && !this.config.rerankEndpoint) {
+          throw new Error(
+            "vLLM rerank provider requires rerankEndpoint to be configured. " +
+              "Example: http://host.docker.internal:12434/engines/vllm/rerank"
+          );
+        }
+
         // Build provider-specific request
         const { headers, body } = buildRerankRequest(
           provider,
